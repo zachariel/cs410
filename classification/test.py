@@ -103,8 +103,8 @@ else:
 print("Loading 20 newsgroups dataset for categories:")
 print(categories if categories else "all")
 
-data_train = load_files('/Users/zachariel/pdn_data/onet_dataset2/train', encoding="utf8")
-data_test  = load_files('/Users/zachariel/pdn_data/onet_dataset2/test', encoding="utf8")
+data_train = load_files('/Users/zachariel/pdn_data/onet_dataset/train', encoding="utf8")
+data_test  = load_files('/Users/zachariel/pdn_data/onet_dataset/test', encoding="utf8")
 #data_train = fetch_20newsgroups(subset='train', categories=categories,
 #                                shuffle=True, random_state=42,
 #                                remove=remove)
@@ -231,17 +231,18 @@ def benchmark(clf):
 
 
 results = []
-for clf, name in (
-        (RidgeClassifier(tol=1e-2, solver="lsqr"), "Ridge Classifier"),
-        (Perceptron(n_iter=50), "Perceptron"),
-        (PassiveAggressiveClassifier(n_iter=50), "Passive-Aggressive"),
-        (KNeighborsClassifier(n_neighbors=10), "kNN"),
-        (RandomForestClassifier(n_estimators=100), "Random forest")):
-    print('=' * 80)
-    print(name)
-    results.append(benchmark(clf))
+#for clf, name in (
+#        (RidgeClassifier(tol=1e-2, solver="lsqr"), "Ridge Classifier"),
+#        (Perceptron(n_iter=50), "Perceptron"),
+#        (PassiveAggressiveClassifier(n_iter=50), "Passive-Aggressive"),
+#        (KNeighborsClassifier(n_neighbors=10), "kNN"),
+#        (RandomForestClassifier(n_estimators=100), "Random forest")):
+#    print('=' * 80)
+#    print(name)
+#    results.append(benchmark(clf))
 
 for penalty in ["l2", "l1"]:
+    if penalty == "l2" : continue
     print('=' * 80)
     print("%s penalty" % penalty.upper())
     # Train Liblinear model
@@ -249,27 +250,27 @@ for penalty in ["l2", "l1"]:
                                        tol=1e-3)))
 
     # Train SGD model
-    results.append(benchmark(SGDClassifier(alpha=.0001, n_iter=50,
-                                           penalty=penalty)))
+    #results.append(benchmark(SGDClassifier(alpha=.0001, n_iter=50,
+    #                                       penalty=penalty)))
 
-# Train SGD with Elastic Net penalty
-print('=' * 80)
-print("Elastic-Net penalty")
-results.append(benchmark(SGDClassifier(alpha=.0001, n_iter=50,
-                                       penalty="elasticnet")))
+## Train SGD with Elastic Net penalty
+#print('=' * 80)
+#print("Elastic-Net penalty")
+#results.append(benchmark(SGDClassifier(alpha=.0001, n_iter=50,
+#                                       penalty="elasticnet")))
 
-# Train NearestCentroid without threshold
-print('=' * 80)
-print("NearestCentroid (aka Rocchio classifier)")
-results.append(benchmark(NearestCentroid()))
+## Train NearestCentroid without threshold
+#print('=' * 80)
+#print("NearestCentroid (aka Rocchio classifier)")
+#results.append(benchmark(NearestCentroid()))
 
-# Train sparse Naive Bayes classifiers
-print('=' * 80)
-print("Naive Bayes")
-results.append(benchmark(MultinomialNB(alpha=.01)))
-results.append(benchmark(BernoulliNB(alpha=.01)))
+## Train sparse Naive Bayes classifiers
+#print('=' * 80)
+#print("Naive Bayes")
+#results.append(benchmark(MultinomialNB(alpha=.01)))
+#results.append(benchmark(BernoulliNB(alpha=.01)))
 
-print('=' * 80)
+
 print("LinearSVC with L1-based feature selection")
 # The smaller C, the stronger the regularization.
 # The more regularization, the more sparsity.

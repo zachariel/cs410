@@ -56,6 +56,30 @@ argv = sys.argv[1:]
 
 (opts, args) = op.parse_args(argv)
 
+categories = [
+    '11-0000',
+    '13-0000',
+    '15-0000',
+    '17-0000',
+    '19-0000',
+    '21-0000',
+    '25-0000',
+    '27-0000',
+    '29-0000',
+    '31-0000',
+    '33-0000',
+    '35-0000',
+    '37-0000',
+    '47-0000',
+    '39-0000',
+    '49-0000',
+    '23-0000',
+    '41-0000',
+    '43-0000',
+    '45-0000',
+    '51-0000',
+    '53-0000'
+]
 
 bunch = load_files(os.path.expanduser(opts.source_directory), load_content=False, random_state=10, encoding="utf8")
 print(bunch)
