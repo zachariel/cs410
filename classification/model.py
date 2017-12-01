@@ -77,6 +77,7 @@ class Model():
 
 from sklearn.datasets import load_files
 
+#https://gist.github.com/bbengfort/044682e76def583a12e6c09209c664a1
 data_train = load_files('/Users/zachariel/pdn_data/onet_dataset/train', encoding="utf8")
 data_test  = load_files('/Users/zachariel/pdn_data/onet_dataset/test',  encoding="utf8")
 m = Model(data_train, data_test)
