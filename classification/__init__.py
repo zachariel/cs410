@@ -1,2 +1,2 @@
 from . import tokenizer
-from . import major_model
+from . import onet_model
