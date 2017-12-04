@@ -109,4 +109,4 @@ def main():
     document = data_train.data[0]
     print(tokenizer.transform([document]))
 
-if __name__ == "__main__" : main()
+#if __name__ == "__main__" : main()
