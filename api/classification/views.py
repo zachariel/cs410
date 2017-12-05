@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from classification.serializers import JobSerializer
 from classification.models import Job
 
+from classifier import onet_model as classifier
+
 # Create your views here.
 def index(request):
     return HttpResponse("Hello, world. You're at the classification index.")
@@ -21,11 +23,16 @@ class JobViewSet(viewsets.ModelViewSet):
     queryset = Job.objects.all().order_by('-created_at')
     serializer_class = JobSerializer
 
+    def create(self, request):
+      return super().create(request)
+
     @list_route(methods=['post', 'get'])
     def classify(self, request, pk=None):
         reference_number = request.POST['reference_number']
         content          = request.POST['content']
         job = Job(reference_number=reference_number, content=content)
+        clf = classifier.OnetModel()
+        job.category = clf.predict(content)
         job.save()
         return Response(str(job.id))
 

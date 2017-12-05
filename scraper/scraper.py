@@ -2,16 +2,31 @@ import sys
 import os
 import re
 import logging
-import Occupations
+import occupations as Occupations
 import requests
 from bs4 import BeautifulSoup
 
 class Page(object):
+    """
+    Base page class, to fetch html code from given url.
+
+    Params:
+    -------
+    url : string
+        URL of page to scrape.
+    """
     def __init__(self, url):
         self.page = None
         self.url = url
 
     def fetch(self):
+        """
+        Execute HTML request over url and fetch source code.
+
+        Returns:
+        --------
+        self
+        """
         logging.debug(self.url)
         HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0"}
         try:
@@ -24,14 +39,34 @@ class Page(object):
 
     @property
     def content(self):
+        """
+        Return page object content.
+        """
         if self.page == None : self.fetch()
 
         return self.page.content
 
     def parse(self):
+        """
+        Base parse method, to be override by child classes.
+        """
         return self
 
 class JobPage(Page):
+    """
+    Class to represent Job Detail Page (JDP).
+
+    This class will scrape an indivual JDP.
+
+    Params:
+    -------
+    url : string
+        JDP url.
+    occupation : string
+        O*Net code for current JDP.
+    job_id : string
+        Job reference number, to prevent download duplicated jobs.
+    """
     def __init__(self, url, occupation, job_id):
         super().__init__(url)
         self.occupation = occupation
@@ -60,29 +95,39 @@ class JobPage(Page):
 
     @property
     def directory(self):
+        """ Directory divided by onet major """
         return "data/" + self.major
 
     @property
     def file_name(self):
+        """ Filename to store parsed page """
         return self.occupation + '_' + self.job_id + '.txt'
 
     @property
     def file_path(self):
+        """ Full path to store file """
         return self.directory + '/' + self.file_name
 
     @property
     def html(self):
+        """ HTML read from page """
         html = self.parse()
         return "h-source: %s\n\n%s" % (self.page.url, html.strip())
 
     @property
     def source(self):
+        """
+        Convert source code into BeautifulSoup object.
+
+        Removing some html tags that shouldn't give us useful information.
+        """
         soup = BeautifulSoup(self.content, 'html.parser')
-        [[s.extract() for s in soup(tag)] for tag in ['head', 'footer', 'meta', 'script', 'style', 'link', 'header']]
+        [[s.extract() for s in soup(tag)] for tag in ['head', 'meta', 'script', 'style', 'link']]
 
         return soup
 
     def parse(self):
+        """ Parse HTML to remove tags like head, script, link, meta """
         if (self.content) == 0 : return None
 
         content = None
@@ -115,7 +160,14 @@ class JobPage(Page):
         if re.search('http(s)?:\/\/www\.governmentjobs\.com\/careers', self.page.url):
             content = self.source.select('div.entity-info')[0].getText()
 
+        if not content :
+            print(self.page.url)
+            content = self.source.getText()
+
+        return self.clean_content(content)
+
         #http://agency.governmentjobs.com/sc/default.cfm?action=viewJob&jobID=1908940
+
 
 # 500 Errors
 #https://www.azjobconnection.gov/ada/r/jobs/AZ02876155
@@ -159,11 +211,6 @@ class JobPage(Page):
 #https://www.sujobopps.com/postings/72694
 #https://jobs.target.com/job/san-francisco/stores-executive-intern-san-francisco-peninsula-oakland-and-alameda/1118/5148289
 
-        if not content :
-            print(self.page.url)
-            content = self.source.getText()
-
-        return self.clean_content(content)
 
     def clean_content(self, html):
         html = re.sub('\r', '', html)
@@ -188,6 +235,12 @@ class JobPage(Page):
         return self
 
 class ResultsPage(Page):
+    """
+    This class will represent a results page.
+
+    This will be the enter point to start our scraping, we will perform a search request
+    and will lead us to this results page.
+    """
     def __init__(self, occupation, title, per_page=500):
         self.occupation = occupation
         self.title = title
@@ -199,15 +252,18 @@ class ResultsPage(Page):
         super().__init__(self.url)
 
     def run(self):
+        """ Run search """
         self.next()
 
     def next(self):
+        """ Calling next over a ResultsPage will move to next page of results an parse it. """
         if self.parse():
             self.current_page = self.current_page + 1
             if self.current_page > self.max_pages : return False
             self.next()
 
     def parse(self):
+        """ Parse results page. """
         logging.info("Parsing current_page: %s" % self.current_page)
         soup = BeautifulSoup(self.content, 'html.parser')
         div = soup.find_all('div', class_='datagrid')
@@ -228,20 +284,43 @@ class ResultsPage(Page):
         return soup
 
 class Scraper(object):
+    """ Scraper main class.
+
+        Used to scrape job board pages, we need to fetch job detail pages to create
+        our database to solve the O*Net classification problem.
+
+        We need to search by specific category using careeronstop.org site.
+
+        Parameters
+        --------------
+        code : string
+            O*Net code of the category to scrape require to perform the search.
+        title : string
+            Category title required to perform the search.
+    """
     def __init__(self, code, title):
         self.code = code
         self.title = title
 
     def __str__(self):
+        """
+            String representation of Scrape object, composed by code and title.
+        """
         return self.code + " " + self.title
 
     def fetch(self):
+        """
+            Create new Scraper object and call run on it.
+        """
         logging.info(str(self))
         ResultsPage(self.code, self.title).run()
         return 'running'
 
     @staticmethod
     def run():
+        """
+            Run scraper on each of the categories.
+        """
         for occupation in Occupations.occupations():
             scraper = Scraper(occupation[0], occupation[1])
             scraper.fetch()
