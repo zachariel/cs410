@@ -2,7 +2,6 @@
 
 from pymysql import connect, err, sys, cursors
 
-conn = connect( host='localhost', user='onet', passwd='onet_123', db="onet_22_1")
 
 #cursor = conn.cursor( cursors.DictCursor )
 
@@ -159,28 +158,30 @@ def work_values(cursor):
     append_data(data, ['description'])
 
 
-try:
-    with conn.cursor( cursors.DictCursor ) as cursor:
-        occupations(cursor)
-        reported_titles(cursor)
-        alternate_titles(cursor)
-        skills(cursor)
-        abilities(cursor)
-        #educations(cursor) #checkthis
-        tasks(cursor)
-        tools(cursor)
-        knowledges(cursor)
-        work_activities(cursor)
-        work_styles(cursor)
-        work_values(cursor)
+def main():
+    try:
+        with conn.cursor( cursors.DictCursor ) as cursor:
+            occupations(cursor)
+            reported_titles(cursor)
+            alternate_titles(cursor)
+            skills(cursor)
+            abilities(cursor)
+            #educations(cursor) #checkthis
+            tasks(cursor)
+            tools(cursor)
+            knowledges(cursor)
+            work_activities(cursor)
+            work_styles(cursor)
+            work_values(cursor)
 
-finally:
-    conn.close()
+    finally:
+        conn.close()
 
-for major, content in majors.items():
-    with open("data/descriptions/major_" + major + ".txt" , "w") as f:
-        try:
-            f.write( " ".join(content) )
-        except:
-            print("Error: ", sys.exc_info()[0])
+    conn = connect( host='localhost', user='onet', passwd='onet_123', db="onet_22_1")
+    for major, content in majors.items():
+        with open("data/descriptions/major_" + major + ".txt" , "w") as f:
+            try:
+                f.write( " ".join(content) )
+            except:
+                print("Error: ", sys.exc_info()[0])
 

@@ -2,17 +2,16 @@ import sys
 import os
 import re
 import logging
-import occupations as Occupations
+from . import occupations
 import requests
 from bs4 import BeautifulSoup
 
 class Page(object):
-    """
-    Base page class, to fetch html code from given url.
+    """Base page class, to fetch html code from given url.
 
-    Params:
-    -------
-    url : string
+    Parameters
+    ----------
+    url: string
         URL of page to scrape.
     """
     def __init__(self, url):
@@ -20,10 +19,9 @@ class Page(object):
         self.url = url
 
     def fetch(self):
-        """
-        Execute HTML request over url and fetch source code.
+        """Execute HTML request over url and fetch source code.
 
-        Returns:
+        Returns
         --------
         self
         """
@@ -39,9 +37,7 @@ class Page(object):
 
     @property
     def content(self):
-        """
-        Return page object content.
-        """
+        """ Return page object content. """
         if self.page == None : self.fetch()
 
         return self.page.content
@@ -58,8 +54,8 @@ class JobPage(Page):
 
     This class will scrape an indivual JDP.
 
-    Params:
-    -------
+    Parameters
+    ----------
     url : string
         JDP url.
     occupation : string
@@ -292,7 +288,7 @@ class Scraper(object):
         We need to search by specific category using careeronstop.org site.
 
         Parameters
-        --------------
+        ----------
         code : string
             O*Net code of the category to scrape require to perform the search.
         title : string

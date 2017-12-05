@@ -5,7 +5,7 @@ class Occupations(object):
     Class used to read text file containing all O*Net code and occupation titles.
     """
     occupations = []
-    def __init__(self, path="../docs/occupations.txt", headers=True):
+    def __init__(self, path="../data/occupations.txt", headers=True):
         """
         Params:
         -------

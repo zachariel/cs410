@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>project.scrape package &#8212; CS410: Project 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="project.clustering package" href="project.clustering.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="project-scrape-package">
+<h1>project.scrape package<a class="headerlink" href="#project-scrape-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-project.scrape.occupations">
+<span id="project-scrape-occupations-module"></span><h2>project.scrape.occupations module<a class="headerlink" href="#module-project.scrape.occupations" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="project.scrape.occupations.Occupations">
+<em class="property">class </em><code class="descclassname">project.scrape.occupations.</code><code class="descname">Occupations</code><span class="sig-paren">(</span><em>path='../data/occupations.txt'</em>, <em>headers=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/occupations.html#Occupations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.occupations.Occupations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class used to read text file containing all O*Net code and occupation titles.</p>
+<dl class="method">
+<dt id="project.scrape.occupations.Occupations.occupations">
+<code class="descname">occupations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/occupations.html#Occupations.occupations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.occupations.Occupations.occupations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all occupations found.</p>
+<dl class="docutils">
+<dt>occupations <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>List with occupations, each row contain array with occupation info.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="project.scrape.occupations.occupations">
+<code class="descclassname">project.scrape.occupations.</code><code class="descname">occupations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/occupations.html#occupations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.occupations.occupations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper to fetch all occupations.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-project.scrape.scraper">
+<span id="project-scrape-scraper-module"></span><h2>project.scrape.scraper module<a class="headerlink" href="#module-project.scrape.scraper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="project.scrape.scraper.JobPage">
+<em class="property">class </em><code class="descclassname">project.scrape.scraper.</code><code class="descname">JobPage</code><span class="sig-paren">(</span><em>url</em>, <em>occupation</em>, <em>job_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#JobPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.JobPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#project.scrape.scraper.Page" title="project.scrape.scraper.Page"><code class="xref py py-class docutils literal"><span class="pre">project.scrape.scraper.Page</span></code></a></p>
+<p>Class to represent Job Detail Page (JDP).</p>
+<p>This class will scrape an indivual JDP.</p>
+<dl class="docutils">
+<dt>url <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>JDP url.</dd>
+<dt>occupation <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>O*Net code for current JDP.</dd>
+<dt>job_id <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Job reference number, to prevent download duplicated jobs.</dd>
+</dl>
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.broad_occupation">
+<code class="descname">broad_occupation</code><a class="headerlink" href="#project.scrape.scraper.JobPage.broad_occupation" title="Permalink to this definition">¶</a></dt>
+<dd><p>fourth and fifth digits represent the broad occupation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="project.scrape.scraper.JobPage.clean_content">
+<code class="descname">clean_content</code><span class="sig-paren">(</span><em>html</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#JobPage.clean_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.JobPage.clean_content" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.directory">
+<code class="descname">directory</code><a class="headerlink" href="#project.scrape.scraper.JobPage.directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory divided by onet major</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.file_name">
+<code class="descname">file_name</code><a class="headerlink" href="#project.scrape.scraper.JobPage.file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filename to store parsed page</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.file_path">
+<code class="descname">file_path</code><a class="headerlink" href="#project.scrape.scraper.JobPage.file_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full path to store file</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.html">
+<code class="descname">html</code><a class="headerlink" href="#project.scrape.scraper.JobPage.html" title="Permalink to this definition">¶</a></dt>
+<dd><p>HTML read from page</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.major">
+<code class="descname">major</code><a class="headerlink" href="#project.scrape.scraper.JobPage.major" title="Permalink to this definition">¶</a></dt>
+<dd><p>first two digits of the SOC code represent the major group;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.minor">
+<code class="descname">minor</code><a class="headerlink" href="#project.scrape.scraper.JobPage.minor" title="Permalink to this definition">¶</a></dt>
+<dd><p>third digit represents the minor group</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.onet">
+<code class="descname">onet</code><a class="headerlink" href="#project.scrape.scraper.JobPage.onet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Each item in the SOC is designated by a six-digit code. The hyphen between the second
+and third digit is used only for clarity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="project.scrape.scraper.JobPage.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#JobPage.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.JobPage.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse HTML to remove tags like head, script, link, meta</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="project.scrape.scraper.JobPage.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#JobPage.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.JobPage.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="project.scrape.scraper.JobPage.source">
+<code class="descname">source</code><a class="headerlink" href="#project.scrape.scraper.JobPage.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert source code into BeautifulSoup object.</p>
+<p>Removing some html tags that shouldn’t give us useful information.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="project.scrape.scraper.Page">
+<em class="property">class </em><code class="descclassname">project.scrape.scraper.</code><code class="descname">Page</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#Page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.Page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Base page class, to fetch html code from given url.</p>
+<dl class="docutils">
+<dt>url: string</dt>
+<dd>URL of page to scrape.</dd>
+</dl>
+<dl class="attribute">
+<dt id="project.scrape.scraper.Page.content">
+<code class="descname">content</code><a class="headerlink" href="#project.scrape.scraper.Page.content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return page object content.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="project.scrape.scraper.Page.fetch">
+<code class="descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#Page.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.Page.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HTML request over url and fetch source code.</p>
+<p>self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="project.scrape.scraper.Page.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#Page.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.Page.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base parse method, to be override by child classes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="project.scrape.scraper.ResultsPage">
+<em class="property">class </em><code class="descclassname">project.scrape.scraper.</code><code class="descname">ResultsPage</code><span class="sig-paren">(</span><em>occupation</em>, <em>title</em>, <em>per_page=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#ResultsPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.ResultsPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#project.scrape.scraper.Page" title="project.scrape.scraper.Page"><code class="xref py py-class docutils literal"><span class="pre">project.scrape.scraper.Page</span></code></a></p>
+<p>This class will represent a results page.</p>
+<p>This will be the enter point to start our scraping, we will perform a search request
+and will lead us to this results page.</p>
+<dl class="method">
+<dt id="project.scrape.scraper.ResultsPage.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#ResultsPage.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.ResultsPage.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calling next over a ResultsPage will move to next page of results an parse it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="project.scrape.scraper.ResultsPage.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#ResultsPage.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.ResultsPage.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse results page.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="project.scrape.scraper.ResultsPage.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#ResultsPage.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.ResultsPage.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run search</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="project.scrape.scraper.Scraper">
+<em class="property">class </em><code class="descclassname">project.scrape.scraper.</code><code class="descname">Scraper</code><span class="sig-paren">(</span><em>code</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#Scraper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.Scraper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Scraper main class.</p>
+<p>Used to scrape job board pages, we need to fetch job detail pages to create
+our database to solve the O*Net classification problem.</p>
+<p>We need to search by specific category using careeronstop.org site.</p>
+<dl class="docutils">
+<dt>code <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>O*Net code of the category to scrape require to perform the search.</dd>
+<dt>title <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Category title required to perform the search.</dd>
+</dl>
+<dl class="method">
+<dt id="project.scrape.scraper.Scraper.fetch">
+<code class="descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#Scraper.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.Scraper.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new Scraper object and call run on it.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="project.scrape.scraper.Scraper.run">
+<em class="property">static </em><code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#Scraper.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.Scraper.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run scraper on each of the categories.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="project.scrape.scraper.main">
+<code class="descclassname">project.scrape.scraper.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/project/scrape/scraper.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#project.scrape.scraper.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-project.scrape">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-project.scrape" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="project.html">project package</a><ul>
+      <li>Previous: <a href="project.clustering.html" title="previous chapter">project.clustering package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Zachariel Norzagaray.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/project.scrape.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

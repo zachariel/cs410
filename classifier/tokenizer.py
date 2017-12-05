@@ -91,18 +91,17 @@ class Tokenizer(BaseEstimator, TransformerMixin):
         return [" ".join(doc) for doc in X]
 
     def transform(self, X):
-        """ Transformer interface method implementation
+        """ Transformer interface method implementation. Takes a list of documents (X)
+            and returns a new list of tokenized documents, where each document is
+            transformed into list of ordered tokens.
 
-            Takes a list of documents (X) and returns a new list of tokenized documents,
-            where each document is transformed into list of ordered tokens.
-
-        Params
-        --------
+        Parameters
+        ----------
         X : list
             List of documents to transforma.
 
         Returns
-        ---------
+        -------
         params : array of tokens per document
         """
         return [

@@ -1,0 +1,412 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>project.scrape.scraper &#8212; CS410: Project 1.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for project.scrape.scraper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">occupations</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
+
+<div class="viewcode-block" id="Page"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.Page">[docs]</a><span class="k">class</span> <span class="nc">Page</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base page class, to fetch html code from given url.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url: string</span>
+<span class="sd">        URL of page to scrape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+
+<div class="viewcode-block" id="Page.fetch"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.Page.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute HTML request over url and fetch source code.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0&quot;</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span> <span class="n">HEADERS</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: &quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return page object content. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">==</span> <span class="kc">None</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">content</span>
+
+<div class="viewcode-block" id="Page.parse"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.Page.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Base parse method, to be override by child classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+
+<div class="viewcode-block" id="JobPage"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.JobPage">[docs]</a><span class="k">class</span> <span class="nc">JobPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to represent Job Detail Page (JDP).</span>
+
+<span class="sd">    This class will scrape an indivual JDP.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url : string</span>
+<span class="sd">        JDP url.</span>
+<span class="sd">    occupation : string</span>
+<span class="sd">        O*Net code for current JDP.</span>
+<span class="sd">    job_id : string</span>
+<span class="sd">        Job reference number, to prevent download duplicated jobs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">occupation</span><span class="p">,</span> <span class="n">job_id</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span> <span class="o">=</span> <span class="n">occupation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_id</span> <span class="o">=</span> <span class="n">job_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">onet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Each item in the SOC is designated by a six-digit code. The hyphen between the second</span>
+<span class="sd">        and third digit is used only for clarity &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">major</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; first two digits of the SOC code represent the major group; &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;-0000&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">minor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; third digit represents the minor group &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;000&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">broad_occupation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; fourth and fifth digits represent the broad occupation &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">onet</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;0&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Directory divided by onet major &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;data/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">major</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Filename to store parsed page &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_id</span> <span class="o">+</span> <span class="s1">&#39;.txt&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Full path to store file &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; HTML read from page &quot;&quot;&quot;</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;h-source: </span><span class="si">%s</span><span class="se">\n\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">html</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert source code into BeautifulSoup object.</span>
+
+<span class="sd">        Removing some html tags that shouldn&#39;t give us useful information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+        <span class="p">[[</span><span class="n">s</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">soup</span><span class="p">(</span><span class="n">tag</span><span class="p">)]</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;head&#39;</span><span class="p">,</span> <span class="s1">&#39;meta&#39;</span><span class="p">,</span> <span class="s1">&#39;script&#39;</span><span class="p">,</span> <span class="s1">&#39;style&#39;</span><span class="p">,</span> <span class="s1">&#39;link&#39;</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="n">soup</span>
+
+<div class="viewcode-block" id="JobPage.parse"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.JobPage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Parse HTML to remove tags like head, script, link, meta &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;http(s?):\/\/.*?us\.jobs&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div.t16.bld.l20&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">body</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;contentm&#39;</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">getText</span><span class="p">(),</span> <span class="n">body</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;http(s?):\/\/.*?usajobs\.gov&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;job-title&#39;</span><span class="p">)</span>
+            <span class="n">body</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;main-content&#39;</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">getText</span><span class="p">(),</span> <span class="n">body</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+
+        <span class="c1">#https://dashboard.montanaworks.gov/IWRSManageAccountWeb/faces/jsp/search/JobDetails.xhtml?jadrId=102664487</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;http(s?):\/\/dashboard\.montanaworks\.gov\/IWRSManageAccountWeb\/faces\/jsp\/search\/JobDetails\.xhtml&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">&#39;h1&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">body</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;jobDetailsDiv&#39;</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">getText</span><span class="p">(),</span> <span class="n">body</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+
+        <span class="c1">#https://jobs.utah.gov/jsp/utjobs/single-job?j=3659721</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;http(s?):\/\/jobs\.utah\.gov\/jsp\/utjobs\/single-job&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span> <span class="s1">&#39;joInlineId&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+
+        <span class="c1">#https://jobs.myflorida.com/job/TALLAHASSEE-OPERATIONS-MANAGER-C-SES-64035425-FL-32399/444240500/</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;http(s)?:\/\/jobs\.myflorida\.com\/job&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div.jobDisplay&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+
+        <span class="c1">#https://www.governmentjobs.com/careers/tracyca/jobs/1913665/city-manager-per-contract</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;http(s)?:\/\/www\.governmentjobs\.com\/careers&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div.entity-info&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span> <span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_content</span><span class="p">(</span><span class="n">content</span><span class="p">)</span></div>
+
+        <span class="c1">#http://agency.governmentjobs.com/sc/default.cfm?action=viewJob&amp;jobID=1908940</span>
+
+
+<span class="c1"># 500 Errors</span>
+<span class="c1">#https://www.azjobconnection.gov/ada/r/jobs/AZ02876155</span>
+<span class="c1">#https://idahoworks.gov/ada/r/jobs/ID01010215</span>
+<span class="c1">#https://www.kansasworks.com/ada/r/jobs/KS10528733</span>
+
+<span class="c1"># Session expires</span>
+<span class="c1">#https://www.employflorida.com/vosnet/jobbanks/jobdetails.aspx?enc=9B8/uT7EfbEIDLIMZ8rho7tTtq1JCrGjGTW0jt1m+sNa9bAzLiA3uWxZ3o2fn5mh4i+aWkk9Ixxy0q9tw3uhnL6zIaDzX3q71naeNBSN9f898VAw0BBYM1rvp3d6inHtVfVbq6+uvF+utxH+TDF0lMb2YU/qALobeMNf9yoLyGE=</span>
+
+<span class="c1">#https://www1.iowajobs.org/jobs/seeker/search/search.seek?actionButton=Search&amp;keywords=6301715</span>
+<span class="c1">#https://hca.taleo.net/careersection/0hca/jobdetail.ftl?job=20792-62910&amp;lang=en</span>
+<span class="c1">#https://ajg.taleo.net/careersection/2/jobdetail.ftl?job=39663#39663</span>
+<span class="c1">#https://massanf.taleo.net/careersection/ex/jobdetail.ftl?job=170006QO&amp;lang=en</span>
+<span class="c1">#https://www.minnesotaworks.net/viewjob.aspx?jobid=9694118</span>
+<span class="c1">#https://jobs.mitalent.org/job-seeker/job-details/5058313</span>
+<span class="c1">#https://virginiajobs.peopleadmin.com/postings/95546#95546</span>
+<span class="c1">#https://wit.twc.state.tx.us/WORKINTEXAS/wtx?pageid=EM_JP_JOB_DETAILS&amp;id=5273305</span>
+<span class="c1">#https://csg.applicantpro.com/jobs/679409.html#679409</span>
+<span class="c1">#http://jobs.hr.wisc.edu//cw/en-us/job/496810/assistant-director</span>
+<span class="c1">#https://csg.applicantpro.com/jobs/679392.html#679392</span>
+<span class="c1">#https://www.jobgateway.pa.gov/jponline/JobSeeker/JobPostingDetails?QCf9GhbSC5Nn41_TB0_axNd6x8c38Fs6lT_RL7JjiNX4Qq0_L3UR2aaWoAc@aBw8Q1JsNTIWPmFT_4oUve5xm37PpJ1BQwyPrEV6Hxo6zqniFwW4sPNx</span>
+<span class="c1">#https://hubinternational.jobs/san-diego-ca/vice-president-policyholder-advocate/788D467A432B4895B767C8CBCA741D2B/job/?utm_campaign=American%20Job%20Center&amp;vs=206&amp;utm_medium=NLX&amp;utm_source=American%20Job%20Center-DE</span>
+<span class="c1">#https://okjobmatch.com/ada/r/jobs/OK01446242</span>
+<span class="c1">#https://jobs-octa.icims.com/jobs/1826/section-manager-ii-iii---measure-m-local-programs/job</span>
+<span class="c1">#https://seeker.worksourcewa.com/jobview/GetJob.aspx?JobID=190911383</span>
+<span class="c1">#https://joblink.maine.gov/ada/r/jobs/280950</span>
+<span class="c1">#https://statejobsny.com/public/vacancyDetailsView.cfm?id=45635#45635</span>
+<span class="c1">#https://www.healthcaresource.com/fremontmedical/index.cfm?fuseaction=search.jobDetails&amp;template=dsp_job_details.cfm&amp;cJobId=102157</span>
+<span class="c1">#https://pfizer.jobs/global/gerente-de-distrito/7BBC4B39E9DE41A99FB51FD728533D0C/job/?utm_campaign=American%20Job%20Center&amp;vs=206&amp;utm_medium=NLX&amp;utm_source=American%20Job%20Center-DE</span>
+<span class="c1">#https://secure.emp.state.or.us/jobs/index.cfm?location_content=jobdisplay.cfm&amp;ord=1981981</span>
+<span class="c1">#http://jobs.jobvite.com/smithbucklin/job/ohfp6fwL?nl=1&amp;nl=1</span>
+<span class="c1">#https://searchjobs.dartmouth.edu/postings/43913</span>
+<span class="c1">#https://jobs.citi.com/job/-/-/287/6307549?utm_source=directemployers&amp;utm_campaign=2017_media_foundational&amp;utm_medium=job_board&amp;utm_content=job_posting&amp;ss=paid</span>
+<span class="c1">#https://cbre.referrals.selectminds.com/jobs/svp-corporate-development-29975?SubSourceId=50000165</span>
+<span class="c1">#https://albany.interviewexchange.com/jobofferdetails.jsp;jsessionid=2220A0605B1B265EEDB9DF4A5028FADE?JOBID=91075&amp;CNTRNO=1&amp;TSTMP=0</span>
+<span class="c1">#https://lacare.secure.force.com/openings/ts2__JobDetails?jobId=a0K2A00000KQOjkUAH&amp;tSource=#a0K2A00000KQOjkUAH</span>
+<span class="c1">#https://nycdoe.silkroad.com/epostings/index.cfm?fuseaction=app.jobinfo&amp;jobid=216773&amp;company_id=15651&amp;version=2&amp;source=ONLINE&amp;jobOwner=1002388&amp;aid=1#216773</span>
+<span class="c1">#https://joblink.alabama.gov/ada/r/jobs/2318020</span>
+<span class="c1">#https://www.jobaps.com/MD/sup/bulpreview.asp?R1=17&amp;R2=002587&amp;R3=0041#170025870041</span>
+<span class="c1">#https://utdirect.utexas.edu/apps/hr/jobs/nlogon/171120010457</span>
+<span class="c1">#https://www.sujobopps.com/postings/72694</span>
+<span class="c1">#https://jobs.target.com/job/san-francisco/stores-executive-intern-san-francisco-peninsula-oakland-and-alameda/1118/5148289</span>
+
+
+<div class="viewcode-block" id="JobPage.clean_content"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.JobPage.clean_content">[docs]</a>    <span class="k">def</span> <span class="nf">clean_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">+&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="JobPage.save"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.JobPage.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">html</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: &quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+
+<div class="viewcode-block" id="ResultsPage"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.ResultsPage">[docs]</a><span class="k">class</span> <span class="nc">ResultsPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class will represent a results page.</span>
+
+<span class="sd">    This will be the enter point to start our scraping, we will perform a search request</span>
+<span class="sd">    and will lead us to this results page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">occupation</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span> <span class="o">=</span> <span class="n">occupation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span> <span class="o">=</span> <span class="n">per_page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://www.careeronestop.org/Toolkit/Jobs/find-jobs.aspx&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;?source=DEA&amp;keyword=</span><span class="si">%s</span><span class="s2">&amp;location=US&amp;occtitle=</span><span class="si">%s</span><span class="s2">&amp;pagesize=</span><span class="si">%s</span><span class="s2">&amp;currentpage=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">occupation</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_pages</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResultsPage.run"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.ResultsPage.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run search &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ResultsPage.next"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.ResultsPage.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calling next over a ResultsPage will move to next page of results an parse it. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_pages</span> <span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ResultsPage.parse"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.ResultsPage.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Parse results page. &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing current_page: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span><span class="p">)</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+        <span class="n">div</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;div&#39;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s1">&#39;datagrid&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">div</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">div</span> <span class="o">=</span> <span class="n">div</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">div</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;tr&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;td&#39;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span>
+            <span class="n">company</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+            <span class="n">job_id</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">:][</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">JobPage</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span><span class="p">,</span> <span class="n">job_id</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">soup</span></div></div>
+
+<div class="viewcode-block" id="Scraper"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.Scraper">[docs]</a><span class="k">class</span> <span class="nc">Scraper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Scraper main class.</span>
+
+<span class="sd">        Used to scrape job board pages, we need to fetch job detail pages to create</span>
+<span class="sd">        our database to solve the O*Net classification problem.</span>
+
+<span class="sd">        We need to search by specific category using careeronstop.org site.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        code : string</span>
+<span class="sd">            O*Net code of the category to scrape require to perform the search.</span>
+<span class="sd">        title : string</span>
+<span class="sd">            Category title required to perform the search.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            String representation of Scrape object, composed by code and title.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+
+<div class="viewcode-block" id="Scraper.fetch"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.Scraper.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Create new Scraper object and call run on it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">ResultsPage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s1">&#39;running&#39;</span></div>
+
+<div class="viewcode-block" id="Scraper.run"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.Scraper.run">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Run scraper on each of the categories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">occupation</span> <span class="ow">in</span> <span class="n">Occupations</span><span class="o">.</span><span class="n">occupations</span><span class="p">():</span>
+            <span class="n">scraper</span> <span class="o">=</span> <span class="n">Scraper</span><span class="p">(</span><span class="n">occupation</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">occupation</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">scraper</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../project.scrape.html#project.scrape.scraper.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">Scraper</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span> <span class="p">:</span> <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Zachariel Norzagaray.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
